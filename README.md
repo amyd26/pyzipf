@@ -1,1 +1,5 @@
-Zipf's Law
+# Zipf's Law
+
+## Contributors
+
+- Amy Davis
