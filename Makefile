@@ -1,7 +1,7 @@
 .PHONY : all clean
 
 COUNT=bin/countwords.py
-RUN_COUNT=python $COUNT
+RUN_COUNT=python $(COUNT)
 
 # Regenerate all results.
 all : results/moby_dick.csv results/jane_eyre.csv
