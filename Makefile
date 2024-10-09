@@ -4,7 +4,7 @@ COUNT=bin/countwords.py
 RUN_COUNT=python $(COUNT)
 
 # Regenerate all results.
-all : results/moby_dick.csv results/jane_eyre.csv
+all : results/moby_dick.csv results/jane_eyre.csv results/time_machine.csv
 
 # Regenerate results for any book.
 results/%.csv : data/%.txt  $(COUNT)
