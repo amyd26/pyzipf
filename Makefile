@@ -1,16 +1,39 @@
-.PHONY : all clean
+.PHONY: all clean help settings
 
-# Regenerate all results.
-all : results/moby_dick.csv results/jane_eyre.csv
+COUNT=bin/countwords.py
+COLLATE=bin/collate.py
+PLOT=bin/plotcounts.py
+DATA=$(wildcard data/*.txt)
+RESULTS=$(patsubst data/%.txt,results/%.csv,$(DATA))
 
-# Regenerate results for "Moby Dick"
-results/moby_dick.csv : data/moby_dick.txt
-	python bin/countwords.py data/moby_dick.txt > results/moby_dick.csv
+## all : regenerate all results.
+all : results/collated.png
 
-# Regenerate results for "Jane Eyre"
-results/jane_eyre.csv : data/jane_eyre.txt
-	python bin/countwords.py data/jane_eyre.txt > results/jane_eyre.csv
+## results/collated.png: plot the collated results.
+results/collated.png : results/collated.csv
+	python $(PLOT) $< --outfile $@
 
-# Remove all generated files.
+## results/collated.csv : collate all results.
+results/collated.csv : $(RESULTS) $(COLLATE)
+	@mkdir -p results
+	python $(COLLATE) $(RESULTS) > $@
+
+## results/%.csv : regenerate result for any book.
+results/%.csv : data/%.txt $(COUNT)
+	python $(COUNT) $< > $@
+
+## clean : remove all generated files.
 clean :
-	rm -f results/*.csv
+	rm $(RESULTS) results/collated.csv results/collated.png
+
+## settings : show variables' values.
+settings :
+	@echo COUNT: $(COUNT)
+	@echo DATA: $(DATA)
+	@echo RESULTS: $(RESULTS)
+	@echo COLLATE: $(COLLATE)
+	@echo PLOT: $(PLOT)
+
+## help : show this message.
+help :
+	@grep '^##' ./Makefile
