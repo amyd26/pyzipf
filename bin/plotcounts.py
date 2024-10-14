@@ -10,11 +10,21 @@ from scipy.optimize import minimize_scalar
 
 
 def nlog_likelihood(beta, counts):
-    # ...as before...
+    """Log-likelihood function."""
+    likelihood = - np.sum(np.log((1/counts)**(beta - 1)
+                          - (1/(counts + 1))**(beta - 1)))
+    return likelihood
 
 
 def get_power_law_params(word_counts):
-    # ...as before...
+    """Get the power law parameters."""
+    mle = minimize_scalar(nlog_likelihood,
+                          bracket=(1 + 1e-10, 4),
+                          args=word_counts,
+                          method='brent')
+    beta = mle.x
+    alpha = 1 / (beta - 1)
+    return alpha
 
 
 def set_plot_params(param_file):
@@ -30,7 +40,25 @@ def set_plot_params(param_file):
 
 
 def plot_fit(curve_xmin, curve_xmax, max_rank, beta, ax):
-    # ...as before...
+    """
+    Plot the power law curve that was fitted to the data.
+
+    Parameters
+    ----------
+    curve_xmin : float
+        Minimum x-bound for fitted curve
+    curve_xmax : float
+        Maximum x-bound for fitted curve
+    max_rank : int
+        Maximum word frequency rank.
+    alpha : float
+        Estimated alpha parameter for the power law.
+    ax : matplotlib axes
+        Scatter plot to which the power curve will be added.
+    """
+    xvals = np.arange(curve_xmin, curve_xmax)
+    yvals = max_rank * (xvals**(-1 / alpha))
+    ax.loglog(xvals, yvals, color='grey')
 
 
 def main(args):
