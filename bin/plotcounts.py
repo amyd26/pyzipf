@@ -2,66 +2,40 @@
 
 import argparse
 
+import yaml
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
 from scipy.optimize import minimize_scalar
 
 
 def nlog_likelihood(beta, counts):
-    """Log-likelihood function."""
-    likelihood = - np.sum(np.log((1/counts)**(beta - 1)
-                          - (1/(counts + 1))**(beta - 1)))
-    return likelihood
+    # ...as before...
 
 
 def get_power_law_params(word_counts):
-    """
-    Get the power law parameters.
-
-    References
-    ----------
-    Moreno-Sanchez et al (2016) define alpha (Eq. 1),
-      beta (Eq. 2) and the maximum likelihood estimation (mle)
-      of beta (Eq. 6).
-
-    Moreno-Sanchez I, Font-Clos F, Corral A (2016)
-      Large-Scale Analysis of Zipf's Law in English Texts.
-      PLoS ONE 11(1): e0147073.
-      https://doi.org/10.1371/journal.pone.0147073
-    """
-    mle = minimize_scalar(nlog_likelihood,
-                          bracket=(1 + 1e-10, 4),
-                          args=word_counts,
-                          method='brent')
-    beta = mle.x
-    alpha = 1 / (beta - 1)
-    return alpha
+    # ...as before...
 
 
-def plot_fit(curve_xmin, curve_xmax, max_rank, alpha, ax):
-    """
-    Plot the power law curve that was fitted to the data.
+def set_plot_params(param_file):
+    """Set the matplotlib parameters."""
+    if param_file:
+        with open(param_file, 'r') as reader:
+            param_dict = yaml.load(reader,
+                                   Loader=yaml.BaseLoader)
+    else:
+        param_dict = {}
+    for param, value in param_dict.items():
+        mpl.rcParams[param] = value
 
-    Parameters
-    ----------
-    curve_xmin : float
-        Minimum x-bound for fitted curve
-    curve_xmax : float
-        Maximum x-bound for fitted curve
-    max_rank : int
-        Maximum word frequency rank.
-    alpha : float
-        Estimated alpha parameter for the power law.
-    ax : matplotlib axes
-        Scatter plot to which the power curve will be added.
-    """
-    xvals = np.arange(curve_xmin, curve_xmax)
-    yvals = max_rank * (xvals**(-1 / alpha))
-    ax.loglog(xvals, yvals, color='grey')
+
+def plot_fit(curve_xmin, curve_xmax, max_rank, beta, ax):
+    # ...as before...
 
 
 def main(args):
     """Run the command line program."""
+    set_plot_params(args.plotparams)
     df = pd.read_csv(args.infile, header=None,
                      names=('word', 'word_frequency'))
     df['rank'] = df['word_frequency'].rank(ascending=False,
@@ -100,6 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('--xlim', type=float, nargs=2,
                         metavar=('XMIN', 'XMAX'),
                         default=None, help='X-axis limits')
+    parser.add_argument('--plotparams', type=str, default=None,
+                        help='matplotlib parameters (YAML file)')
     args = parser.parse_args()
     main(args)
-    
