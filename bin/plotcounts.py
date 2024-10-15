@@ -22,6 +22,9 @@ def get_power_law_params(word_counts):
                           bracket=(1 + 1e-10, 4),
                           args=word_counts,
                           method='brent')
+    assert type(word_counts) ==np.ndarray , \
+        'Input must be a numerical (numpy) array of word counts'
+    mle = minimize_scalar(nlog_likelihood,bracket=(1 + 1e-10, 4),args=word_counts,method='brent')
     beta = mle.x
     alpha = 1 / (beta - 1)
     return alpha
